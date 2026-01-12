@@ -13,6 +13,8 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: devcontainers/action@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           publish-features: true
           base-path-to-features: ".devcontainer/features"
