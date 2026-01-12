@@ -1,0 +1,15 @@
+{
+    "id": "claude-code",
+    "version": "1.0.0",
+    "name": "claude-code",
+    "mounts": [
+        {
+            "source": "claude-code",
+            "target": "/claude-code",
+            "type": "volume"
+        }
+    ],
+    "postCreateCommand": {
+        "fix-volume-perm": "sudo chown -R ${USER}:${USER} /claude-code"
+    }
+}

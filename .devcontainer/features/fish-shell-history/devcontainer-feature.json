@@ -8,5 +8,8 @@
             "target": "/fish-history",
             "type": "volume"
         }
-    ]
+    ],
+    "postCreateCommand": {
+        "fix-volume-perm": "sudo chown -R ${USER}:${USER} /fish-history"
+    }
 }
