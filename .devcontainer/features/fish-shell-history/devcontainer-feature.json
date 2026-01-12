@@ -1,7 +1,7 @@
 {
-    "id": "fish",
+    "id": "fish-shell-history",
     "version": "1.0.0",
-    "name": "fish",
+    "name": "fish-shell-history",
     "mounts": [
         {
             "source": "fish-history-${devcontainerId}",
