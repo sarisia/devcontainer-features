@@ -1,0 +1,12 @@
+{
+    "id": "fish",
+    "version": "1.0.0",
+    "name": "fish",
+    "mounts": [
+        {
+            "source": "fish-history-${devcontainerId}",
+            "target": "/fish-history",
+            "type": "volume"
+        }
+    ]
+}
