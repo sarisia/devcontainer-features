@@ -1,0 +1,12 @@
+{
+    "id": "opencode",
+    "version": "1.0.0",
+    "name": "opencode",
+    "mounts": [
+        {
+            "source": "${localEnv:HOME}/.local/share/opencode",
+            "target": "/opencode",
+            "type": "bind"
+        }
+    ]
+}
