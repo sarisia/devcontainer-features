@@ -9,7 +9,7 @@
 	"features": {
 		// "./features/fish-shell-history": {},
 		// "./features/claude-code": {},
-		"./features/opencode": {}
+		// "./features/opencode": {}
 	}
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
