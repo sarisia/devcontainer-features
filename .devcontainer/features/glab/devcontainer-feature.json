@@ -1,11 +1,11 @@
 {
     "id": "glab",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "name": "glab",
     "mounts": [
         {
             "source": "${localEnv:HOME}/.config/glab-cli",
-            "target": "/home/vscode/.config/glab-cli",
+            "target": "/glab-cli",
             "type": "bind"
         }
     ]
