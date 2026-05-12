@@ -10,6 +10,7 @@
 		// "./features/fish-shell-history": {},
 		// "./features/claude-code": {},
 		"./features/glab": {},
+		"./features/gh": {},
 		"./features/opencode": {}
 	}
 
