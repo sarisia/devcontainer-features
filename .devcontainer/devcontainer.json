@@ -7,11 +7,11 @@
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
-		// "./features/fish-shell-history": {},
-		// "./features/claude-code": {},
+		"./features/fish-shell-history": {},
 		"./features/glab": {},
 		"./features/gh": {},
-		"./features/opencode": {}
+		"./features/opencode": {},
+		"./features/claude-code": {}
 	}
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.

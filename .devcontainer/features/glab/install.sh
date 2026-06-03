@@ -26,8 +26,3 @@ trap 'rm -rf "${tmpdir}"' EXIT
 curl -fsSL "${download_url}" -o "${tmpdir}/glab.tar.gz"
 tar -xzf "${tmpdir}/glab.tar.gz" -C "${tmpdir}"
 install -m 0755 "${tmpdir}/bin/glab" /usr/local/bin/glab
-
-# remove ~/.config/glab-cli and use bind mount from host instead
-rm -rf "/home/${_REMOTE_USER}/.config/glab-cli"
-su ${_REMOTE_USER} -c "mkdir -p /home/${_REMOTE_USER}/.config" 2>&1
-ln -sf /glab-cli "/home/${_REMOTE_USER}/.config/glab-cli"

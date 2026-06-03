@@ -1,11 +1,14 @@
 {
     "id": "gh",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "gh",
+    "postCreateCommand": {
+        "gh-link-config-dir": "bash -c 'mkdir -p ~/.config && rm -rf ~/.config/gh && ln -sf /mnt/gh ~/.config/gh'"
+    },
     "mounts": [
         {
             "source": "${localEnv:HOME}/.config/gh",
-            "target": "/gh",
+            "target": "/mnt/gh",
             "type": "bind"
         }
     ]

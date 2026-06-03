@@ -1,11 +1,19 @@
 {
     "id": "claude-code",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "name": "claude-code",
+    "postCreateCommand": {
+        "claude-code-link-claude-dir": "bash -c 'rm -rf ~/.claude && ln -sf /mnt/.claude ~/.claude && ln -sf /mnt/.claude.json ~/.claude.json'"
+    },
     "mounts": [
         {
             "source": "${localEnv:HOME}/.claude",
-            "target": "/.claude",
+            "target": "/mnt/.claude",
+            "type": "bind"
+        },
+        {
+            "source": "${localEnv:HOME}/.claude.json",
+            "target": "/mnt/.claude.json",
             "type": "bind"
         }
     ]

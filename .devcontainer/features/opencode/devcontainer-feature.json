@@ -1,16 +1,20 @@
 {
     "id": "opencode",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "name": "opencode",
+    "postCreateCommand": {
+        "opencode-link-claude-dir": "bash -c 'rm -rf ~/.claude && ln -sf /mnt/.claude ~/.claude'",
+        "opencode-link-data-dir": "bash -c 'mkdir -p ~/.local/share && rm -rf ~/.local/share/opencode && ln -sf /mnt/opencode ~/.local/share/opencode'"
+    },
     "mounts": [
         {
             "source": "${localEnv:HOME}/.claude",
-            "target": "/.claude",
+            "target": "/mnt/.claude",
             "type": "bind"
         },
         {
             "source": "${localEnv:HOME}/.local/share/opencode",
-            "target": "/opencode",
+            "target": "/mnt/opencode",
             "type": "bind"
         }
     ]
