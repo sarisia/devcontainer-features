@@ -1,0 +1,16 @@
+{
+    "id": "fish",
+    "version": "1.0.0",
+    "name": "fish",
+    "mounts": [
+        {
+            "source": "fish-shell-history-${devcontainerId}",
+            "target": "/mnt/fish-shell-history",
+            "type": "volume"
+        }
+    ],
+    "postCreateCommand": {
+        "fix-volume-perm": "bash -c 'sudo chown -R ${USER}:${USER} /mnt/fish-shell-history'",
+        "fish-link-history-file": "bash -c 'mkdir -p ~/.local/share/fish && ln -sf /mnt/fish-shell-history/fish_history ~/.local/share/fish/fish_history'"
+    }
+}
