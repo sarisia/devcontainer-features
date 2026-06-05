@@ -1,11 +1,7 @@
 {
     "id": "opencode",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "name": "opencode",
-    "postCreateCommand": {
-        "opencode-link-claude-dir": "bash -c 'rm -rf ~/.claude && ln -sf /mnt/.claude ~/.claude'",
-        "opencode-link-data-dir": "bash -c 'mkdir -p ~/.local/share && rm -rf ~/.local/share/opencode && ln -sf /mnt/opencode ~/.local/share/opencode'"
-    },
     "mounts": [
         {
             "source": "${localEnv:HOME}/.claude",

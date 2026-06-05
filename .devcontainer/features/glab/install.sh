@@ -26,3 +26,6 @@ trap 'rm -rf "${tmpdir}"' EXIT
 curl -fsSL "${download_url}" -o "${tmpdir}/glab.tar.gz"
 tar -xzf "${tmpdir}/glab.tar.gz" -C "${tmpdir}"
 install -m 0755 "${tmpdir}/bin/glab" /usr/local/bin/glab
+
+# symlink in install.sh to avoid conflicting with the mount in devcontainer.json
+su ${_REMOTE_USER} -c 'mkdir -p ~/.config && rm -rf ~/.config/glab-cli && ln -sf /mnt/glab-cli ~/.config/glab-cli'

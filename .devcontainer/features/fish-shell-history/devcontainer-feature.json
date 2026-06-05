@@ -1,6 +1,6 @@
 {
     "id": "fish-shell-history",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "name": "fish-shell-history",
     "mounts": [
         {
@@ -10,7 +10,6 @@
         }
     ],
     "postCreateCommand": {
-        "fix-volume-perm": "bash -c 'sudo chown -R ${USER}:${USER} /mnt/fish-shell-history'",
-        "fish-link-history-file": "bash -c 'mkdir -p ~/.local/share/fish && ln -sf /mnt/fish-shell-history/fish_history ~/.local/share/fish/fish_history'"
+        "fix-volume-perm": "bash -c 'sudo chown -R ${USER}:${USER} /mnt/fish-shell-history'"
     }
 }

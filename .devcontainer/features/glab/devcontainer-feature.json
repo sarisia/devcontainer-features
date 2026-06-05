@@ -1,10 +1,7 @@
 {
     "id": "glab",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "name": "glab",
-    "postCreateCommand": {
-        "glab-link-config-dir": "bash -c 'mkdir -p ~/.config && rm -rf ~/.config/glab-cli && ln -sf /mnt/glab-cli ~/.config/glab-cli'"
-    },
     "mounts": [
         {
             "source": "${localEnv:HOME}/.config/glab-cli",

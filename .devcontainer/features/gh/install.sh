@@ -26,3 +26,6 @@ trap 'rm -rf "${tmpdir}"' EXIT
 curl -fsSL "${download_url}" -o "${tmpdir}/gh.tar.gz"
 tar -xzf "${tmpdir}/gh.tar.gz" -C "${tmpdir}"
 install -m 0755 "${tmpdir}/gh_${version}_linux_${gh_arch}/bin/gh" /usr/local/bin/gh
+
+# symlink in install.sh to avoid conflicting with the mount in devcontainer.json
+su ${_REMOTE_USER} -c 'mkdir -p ~/.config && rm -rf ~/.config/gh && ln -sf /mnt/gh ~/.config/gh'
