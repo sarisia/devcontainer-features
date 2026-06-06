@@ -11,7 +11,7 @@
 		"./features/glab": {},
 		"./features/gh": {},
 		"./features/opencode": {},
-		"./features/claude-code": {}
+		"./features/claude": {}
 	}
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
