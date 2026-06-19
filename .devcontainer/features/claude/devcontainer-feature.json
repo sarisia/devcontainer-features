@@ -1,7 +1,15 @@
 {
     "id": "claude",
-    "version": "1.2.2",
+    "version": "1.3.0",
     "name": "claude",
+    "options": {
+        "channel": {
+            "type": "string",
+            "enum": ["latest", "stable"],
+            "default": "latest",
+            "description": "Claude Code apt release channel"
+        }
+    },
     "mounts": [
         {
             "source": "${localEnv:HOME}/.claude",

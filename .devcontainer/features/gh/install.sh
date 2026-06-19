@@ -2,30 +2,23 @@
 
 set -euo pipefail
 
-case "$(dpkg --print-architecture)" in
-    amd64)
-        gh_arch="amd64"
-        ;;
-    arm64)
-        gh_arch="arm64"
-        ;;
-    *)
-        echo "Unsupported architecture: $(dpkg --print-architecture)" >&2
-        exit 1
-        ;;
-esac
+# Install via the official GitHub CLI apt repository
+# https://github.com/cli/cli/blob/trunk/docs/install_linux.md#debian
+apt-get update
+apt-get install -y curl gpg
 
-release_url="$(curl -fsSIL -o /dev/null -w '%{url_effective}' "https://github.com/cli/cli/releases/latest")"
-version="${release_url##*/}"
-version="${version#v}"
-download_url="https://github.com/cli/cli/releases/latest/download/gh_${version}_linux_${gh_arch}.tar.gz"
+mkdir -p -m 755 /etc/apt/keyrings
+out="$(mktemp)"
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg -o "${out}"
+cat "${out}" | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
 
-tmpdir="$(mktemp -d)"
-trap 'rm -rf "${tmpdir}"' EXIT
+mkdir -p -m 755 /etc/apt/sources.list.d
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+    | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
 
-curl -fsSL "${download_url}" -o "${tmpdir}/gh.tar.gz"
-tar -xzf "${tmpdir}/gh.tar.gz" -C "${tmpdir}"
-install -m 0755 "${tmpdir}/gh_${version}_linux_${gh_arch}/bin/gh" /usr/local/bin/gh
+apt-get update
+apt-get install -y gh
 
 # symlink in install.sh to avoid conflicting with the mount in devcontainer.json
 su ${_REMOTE_USER} -c 'mkdir -p ~/.config && rm -rf ~/.config/gh && ln -sf /mnt/gh ~/.config/gh'

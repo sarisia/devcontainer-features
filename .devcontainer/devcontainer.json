@@ -3,7 +3,8 @@
 {
 	"name": "Debian",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/base:bookworm",
+	"image": "mcr.microsoft.com/devcontainers/javascript-node:22-bookworm",
+	// "image": "mcr.microsoft.com/devcontainers/base:bookworm",
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
@@ -11,6 +12,7 @@
 		"./features/glab": {},
 		"./features/gh": {},
 		"./features/opencode": {},
+		"./features/codex": {},
 		"./features/claude": {}
 	}
 

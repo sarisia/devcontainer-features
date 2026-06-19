@@ -6,7 +6,7 @@ A collection of devcontainer features that mount host credentials and configs in
 
 ### `claude`
 
-Installs [Claude Code](https://claude.ai/code) CLI and mounts `~/.claude` / `~/.claude.json` from the host so settings and sessions persist.
+Installs [Claude Code](https://claude.ai/code) CLI via the official apt repository and mounts `~/.claude` / `~/.claude.json` from the host so settings and sessions persist. The `channel` option selects the apt release channel (`latest` or `stable`, default: `latest`).
 
 ```json
 "features": {
@@ -47,6 +47,18 @@ Installs the latest [GitLab CLI](https://gitlab.com/gitlab-org/cli) and mounts `
 ```json
 "features": {
     "ghcr.io/sarisia/devcontainer-features/glab:1": {}
+}
+```
+
+---
+
+### `codex`
+
+Installs [Codex CLI](https://developers.openai.com/codex/cli) via npm and mounts `~/.codex` from the host so auth and sessions persist. Requires Node.js — add the [node feature](https://github.com/devcontainers/features/tree/main/src/node) to your devcontainer.
+
+```json
+"features": {
+    "ghcr.io/sarisia/devcontainer-features/codex:1": {}
 }
 ```
 
