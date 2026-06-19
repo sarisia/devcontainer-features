@@ -4,6 +4,17 @@ A collection of devcontainer features that mount host credentials and configs in
 
 ## Features
 
+| Feature | Feature URL | Requires | Host Mounts |
+|---------|-------------|----------|-------------|
+| [`claude`](#claude) | `ghcr.io/sarisia/devcontainer-features/claude:1` | — | `~/.claude`, `~/.claude.json` |
+| [`opencode`](#opencode) | `ghcr.io/sarisia/devcontainer-features/opencode:1` | npm | `~/.claude`, `~/.local/share/opencode` |
+| [`gh`](#gh) | `ghcr.io/sarisia/devcontainer-features/gh:1` | — | `~/.config/gh` |
+| [`glab`](#glab) | `ghcr.io/sarisia/devcontainer-features/glab:1` | — | `~/.config/glab-cli` |
+| [`codex`](#codex) | `ghcr.io/sarisia/devcontainer-features/codex:1` | npm | `~/.codex` |
+| [`fish`](#fish) | `ghcr.io/sarisia/devcontainer-features/fish:1` | — | — |
+
+> **npm**: can be installed natively on the host or via the [`ghcr.io/devcontainers/features/node:2`](https://github.com/devcontainers/features/tree/main/src/node) devcontainer feature.
+
 ### `claude`
 
 Installs [Claude Code](https://claude.ai/code) CLI via the official apt repository and mounts `~/.claude` / `~/.claude.json` from the host so settings and sessions persist. The `channel` option selects the apt release channel (`latest` or `stable`, default: `latest`).
