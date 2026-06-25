@@ -1,6 +1,6 @@
 {
     "id": "opencode",
-    "version": "1.2.0",
+    "version": "2.0.0",
     "name": "opencode",
     "installsAfter": [
         "ghcr.io/devcontainers/features/node:2"
@@ -14,6 +14,11 @@
         {
             "source": "${localEnv:HOME}/.local/share/opencode",
             "target": "/mnt/opencode",
+            "type": "bind"
+        },
+        {
+            "source": "${localEnv:HOME}/.agents",
+            "target": "/mnt/.agents",
             "type": "bind"
         }
     ]

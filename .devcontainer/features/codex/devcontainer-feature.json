@@ -1,8 +1,8 @@
 {
     "id": "codex",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "name": "codex",
-    "description": "Installs Codex CLI and mounts ~/.codex from the host so auth and sessions persist.",
+    "description": "Installs Codex CLI and mounts ~/.codex and ~/.agents from the host so auth and sessions persist.",
     "installsAfter": [
         "ghcr.io/devcontainers/features/node:2"
     ],
@@ -10,6 +10,11 @@
         {
             "source": "${localEnv:HOME}/.codex",
             "target": "/mnt/.codex",
+            "type": "bind"
+        },
+        {
+            "source": "${localEnv:HOME}/.agents",
+            "target": "/mnt/.agents",
             "type": "bind"
         }
     ]
