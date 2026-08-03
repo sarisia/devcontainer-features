@@ -1,6 +1,6 @@
 {
     "id": "gh",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "name": "gh",
     "mounts": [
         {
@@ -8,5 +8,12 @@
             "target": "/mnt/gh",
             "type": "bind"
         }
-    ]
+    ],
+    "options": {
+        "extensions": {
+            "type": "string",
+            "default": "github/gh-stack",
+            "description": "Comma-separated list of gh extensions to install with `gh extension install`. Empty string installs none."
+        }
+    }
 }

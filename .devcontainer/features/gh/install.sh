@@ -22,3 +22,14 @@ apt-get install -y gh
 
 # symlink in install.sh to avoid conflicting with the mount in devcontainer.json
 su ${_REMOTE_USER} -c 'mkdir -p ~/.config && rm -rf ~/.config/gh && ln -sf /mnt/gh ~/.config/gh'
+
+# Install gh extensions
+# - not passed: JSON default provides "github/gh-stack"
+# - empty string: install nothing (dash form keeps empty as empty)
+EXTENSIONS="${EXTENSIONS-github/gh-stack}"
+IFS=',' read -ra _exts <<< "${EXTENSIONS}"
+for ext in "${_exts[@]}"; do
+    ext="$(echo "${ext}" | xargs)"   # trim surrounding whitespace
+    [ -z "${ext}" ] && continue
+    su ${_REMOTE_USER} -c "gh extension install '${ext}'"
+done
