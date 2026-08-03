@@ -41,11 +41,13 @@ Installs [OpenCode](https://opencode.ai) CLI and mounts `~/.claude` / `~/.local/
 
 ### `gh`
 
-Installs the latest [GitHub CLI](https://cli.github.com) and mounts `~/.config/gh` from the host so auth tokens persist.
+Installs the latest [GitHub CLI](https://cli.github.com) and mounts `~/.config/gh` from the host so auth tokens persist. The `extensions` option is a comma-separated list of extensions installed with `gh extension install` (default: `github/gh-stack`); set it to an empty string to install none.
 
 ```json
 "features": {
-    "ghcr.io/sarisia/devcontainer-features/gh:1": {}
+    "ghcr.io/sarisia/devcontainer-features/gh:1": {
+        "extensions": "github/gh-stack,github/gh-skyline"
+    }
 }
 ```
 
