@@ -32,9 +32,9 @@ for ext in "${_exts[@]}"; do
 done
 
 # `gh extension install` above can write a container-local ~/.config/gh/config.yml.
-# Discard it before linking -- nothing gh writes here at build time is user data,
-# and adopt_entry is dirs-only so this file would otherwise permanently shadow
-# the host's config.yml once the mount is linked.
+# Discard it before linking -- it's build-time junk, not user data, and if left
+# in place it would get adopted onto (or shadow) the host's real config.yml
+# once the mount is linked.
 su ${_REMOTE_USER} -c 'rm -rf ~/.config/gh'
 
 # The bind mount does not exist at image build time, so linking has to happen at

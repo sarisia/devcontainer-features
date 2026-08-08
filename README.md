@@ -24,10 +24,10 @@ These features mount host directories into the container and symlink them into p
 
 - **Existing container entries win.** Anything already at, say, `~/.claude/settings.json` is left alone, so a dotfiles installer can own config files.
 - **`exclude`** is a comma-separated list of entry names to keep container-local (e.g. `settings.json,skills`).
-- **New state is adopted.** A directory a tool creates in the container is moved onto the host on the next container start, then symlinked back.
+- **New state is adopted.** A directory or file a tool creates in the container is moved onto the host on the next container start, then symlinked back.
 - **Overlapping mounts are fine.** `claude`/`opencode` share `~/.claude`, `codex`/`opencode` share `~/.agents`; linking is idempotent. Set the same `exclude` on both, or one will link what the other skips.
 
-On a Linux host with a UID-mismatched remote user, adopted directories are owned by the container UID.
+On a Linux host with a UID-mismatched remote user, adopted directories and files are owned by the container UID.
 
 ### `claude`
 

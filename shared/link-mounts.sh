@@ -26,16 +26,16 @@ link_entry() {
 }
 
 # The link loop below only sees what the mount already has, and link_entry
-# deliberately never overwrites a real dir -- so anything a tool created
-# container-locally while the host lacked it would stay local forever. Move it
-# to the host and link back.
+# deliberately never overwrites a real file or dir -- so anything a tool
+# created container-locally while the host lacked it would stay local
+# forever. Move it to the host and link back.
 adopt_entry() {
     dst=$1
     mount=$2
     name=${dst##*/}
 
     [ -L "$dst" ] && return 0                          # ours, or the dotfiles install's
-    [ -d "$dst" ] || return 0                          # dirs only; files are too risky
+    [ -e "$dst" ] || return 0                          # unmatched glob
     case ",$EXCLUDE," in *",$name,"*) return 0 ;; esac
     [ -e "$mount/$name" ] && return 0                  # something already at the destination
 
