@@ -14,6 +14,14 @@
             "type": "string",
             "default": "github/gh-stack",
             "description": "Comma-separated list of gh extensions to install with `gh extension install`. Empty string installs none."
+        },
+        "exclude": {
+            "type": "string",
+            "default": "",
+            "description": "Comma-separated entry names to keep container-local instead of symlinking from the host: top-level entries of `~/.config/gh` (e.g. `config.yml`). Also suppresses container->host adoption for the listed entries."
         }
+    },
+    "postStartCommand": {
+        "link-mounts": "/usr/local/share/gh-feature/links.sh"
     }
 }

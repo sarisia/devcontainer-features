@@ -27,5 +27,13 @@ curl -fsSL "${download_url}" -o "${tmpdir}/glab.tar.gz"
 tar -xzf "${tmpdir}/glab.tar.gz" -C "${tmpdir}"
 install -m 0755 "${tmpdir}/bin/glab" /usr/local/bin/glab
 
-# symlink in install.sh to avoid conflicting with the mount in devcontainer.json
-su ${_REMOTE_USER} -c 'mkdir -p ~/.config && rm -rf ~/.config/glab-cli && ln -sf /mnt/glab-cli ~/.config/glab-cli'
+# The bind mount does not exist at image build time, so linking has to happen at
+# runtime; ship the script and let postStartCommand run it.
+SHARE=/usr/local/share/glab-feature
+install -d -m 0755 "$SHARE"
+install -m 0644 "$(dirname "$0")/link-mounts.sh" "$SHARE/link-mounts.sh"
+install -m 0755 "$(dirname "$0")/links.sh" "$SHARE/links.sh"
+
+# Feature options are only in the environment during install; persist for postStart.
+printf '%s\n' "${EXCLUDE:-}" > "$SHARE/exclude"
+chmod 0644 "$SHARE/exclude"

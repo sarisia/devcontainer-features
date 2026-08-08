@@ -20,9 +20,6 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubc
 apt-get update
 apt-get install -y gh
 
-# symlink in install.sh to avoid conflicting with the mount in devcontainer.json
-su ${_REMOTE_USER} -c 'mkdir -p ~/.config && rm -rf ~/.config/gh && ln -sf /mnt/gh ~/.config/gh'
-
 # Install gh extensions
 # - not passed: JSON default provides "github/gh-stack"
 # - empty string: install nothing (dash form keeps empty as empty)
@@ -33,3 +30,20 @@ for ext in "${_exts[@]}"; do
     [ -z "${ext}" ] && continue
     su ${_REMOTE_USER} -c "gh extension install '${ext}'"
 done
+
+# `gh extension install` above can write a container-local ~/.config/gh/config.yml.
+# Discard it before linking -- nothing gh writes here at build time is user data,
+# and adopt_entry is dirs-only so this file would otherwise permanently shadow
+# the host's config.yml once the mount is linked.
+su ${_REMOTE_USER} -c 'rm -rf ~/.config/gh'
+
+# The bind mount does not exist at image build time, so linking has to happen at
+# runtime; ship the script and let postStartCommand run it.
+SHARE=/usr/local/share/gh-feature
+install -d -m 0755 "$SHARE"
+install -m 0644 "$(dirname "$0")/link-mounts.sh" "$SHARE/link-mounts.sh"
+install -m 0755 "$(dirname "$0")/links.sh" "$SHARE/links.sh"
+
+# Feature options are only in the environment during install; persist for postStart.
+printf '%s\n' "${EXCLUDE:-}" > "$SHARE/exclude"
+chmod 0644 "$SHARE/exclude"

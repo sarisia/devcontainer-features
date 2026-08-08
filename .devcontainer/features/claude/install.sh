@@ -19,5 +19,13 @@ echo "deb [signed-by=/etc/apt/keyrings/claude-code.asc] https://downloads.claude
 apt-get update
 apt-get install -y claude-code
 
-# symlink in install.sh to avoid conflicting with the mount in devcontainer.json
-su ${_REMOTE_USER} -c 'rm -rf ~/.claude && ln -sf /mnt/.claude ~/.claude && ln -sf /mnt/.claude.json ~/.claude.json'
+# The bind mounts do not exist at image build time, so linking has to happen at
+# runtime; ship the script and let postStartCommand run it.
+SHARE=/usr/local/share/claude-feature
+install -d -m 0755 "$SHARE"
+install -m 0644 "$(dirname "$0")/link-mounts.sh" "$SHARE/link-mounts.sh"
+install -m 0755 "$(dirname "$0")/links.sh" "$SHARE/links.sh"
+
+# Feature options are only in the environment during install; persist for postStart.
+printf '%s\n' "${EXCLUDE:-}" > "$SHARE/exclude"
+chmod 0644 "$SHARE/exclude"

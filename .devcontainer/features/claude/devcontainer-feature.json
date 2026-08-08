@@ -8,6 +8,11 @@
             "enum": ["latest", "stable"],
             "default": "latest",
             "description": "Claude Code apt release channel"
+        },
+        "exclude": {
+            "type": "string",
+            "default": "",
+            "description": "Comma-separated entry names to keep container-local instead of symlinking from the host: top-level entries of `~/.claude` (e.g. `settings.json,skills`), plus `.claude.json` for the host's `~/.claude.json`. Also suppresses container->host adoption for the listed entries."
         }
     },
     "mounts": [
@@ -21,5 +26,8 @@
             "target": "/mnt/.claude.json",
             "type": "bind"
         }
-    ]
+    ],
+    "postStartCommand": {
+        "link-mounts": "/usr/local/share/claude-feature/links.sh"
+    }
 }

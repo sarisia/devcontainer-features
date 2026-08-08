@@ -6,6 +6,13 @@
     "installsAfter": [
         "ghcr.io/devcontainers/features/node:2"
     ],
+    "options": {
+        "exclude": {
+            "type": "string",
+            "default": "",
+            "description": "Comma-separated entry names to keep container-local instead of symlinking from the host: top-level entries of `~/.codex` and `~/.agents` (e.g. `config.toml,skills`). Also suppresses container->host adoption for the listed entries."
+        }
+    },
     "mounts": [
         {
             "source": "${localEnv:HOME}/.codex",
@@ -17,5 +24,8 @@
             "target": "/mnt/.agents",
             "type": "bind"
         }
-    ]
+    ],
+    "postStartCommand": {
+        "link-mounts": "/usr/local/share/codex-feature/links.sh"
+    }
 }

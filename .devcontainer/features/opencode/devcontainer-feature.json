@@ -5,6 +5,13 @@
     "installsAfter": [
         "ghcr.io/devcontainers/features/node:2"
     ],
+    "options": {
+        "exclude": {
+            "type": "string",
+            "default": "",
+            "description": "Comma-separated entry names to keep container-local instead of symlinking from the host: top-level entries of `~/.claude`, `~/.local/share/opencode` and `~/.agents` (e.g. `settings.json,skills`). Also suppresses container->host adoption for the listed entries."
+        }
+    },
     "mounts": [
         {
             "source": "${localEnv:HOME}/.claude",
@@ -21,5 +28,8 @@
             "target": "/mnt/.agents",
             "type": "bind"
         }
-    ]
+    ],
+    "postStartCommand": {
+        "link-mounts": "/usr/local/share/opencode-feature/links.sh"
+    }
 }

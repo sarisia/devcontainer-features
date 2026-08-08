@@ -8,5 +8,15 @@
             "target": "/mnt/glab-cli",
             "type": "bind"
         }
-    ]
+    ],
+    "options": {
+        "exclude": {
+            "type": "string",
+            "default": "",
+            "description": "Comma-separated entry names to keep container-local instead of symlinking from the host: top-level entries of `~/.config/glab-cli` (e.g. `config.yml`). Also suppresses container->host adoption for the listed entries."
+        }
+    },
+    "postStartCommand": {
+        "link-mounts": "/usr/local/share/glab-feature/links.sh"
+    }
 }
