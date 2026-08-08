@@ -15,6 +15,9 @@ A collection of devcontainer features that mount host credentials and configs in
 
 > **npm**: can be installed natively on the host or via the [`ghcr.io/devcontainers/features/node:2`](https://github.com/devcontainers/features/tree/main/src/node) devcontainer feature.
 
+> **Renamed:** `claude-code` → `claude` and `fish-shell-history` → `fish`. The old feature URLs are still
+> published as aliases (`legacyIds`) and resolve to the current features.
+
 ## How mounts are linked
 
 These features mount host directories into the container and symlink them into place at container start — one link per top-level entry (`~/.claude/projects`, `~/.config/gh/hosts.yml`, …), not a symlink over the whole directory.
