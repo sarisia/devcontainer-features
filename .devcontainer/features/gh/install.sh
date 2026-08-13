@@ -2,23 +2,41 @@
 
 set -euo pipefail
 
-# Install via the official GitHub CLI apt repository
-# https://github.com/cli/cli/blob/trunk/docs/install_linux.md#debian
-apt-get update
-apt-get install -y curl gpg
+# A binary already on PATH belongs to someone else -- the base image, another
+# feature, or the user's dotfiles. Reinstalling over it either hard-fails (dpkg
+# file conflict, npm EEXIST) or silently clobbers their copy, so leave it alone
+# and skip only the install; the config below always runs.
+#
+# Checked as root AND as $_REMOTE_USER: `npm i -g` under nvm and native
+# installers writing ~/.local/bin land on the remote user's PATH only.
+find_bin() {
+    p="$(command -v "$1" 2>/dev/null \
+        || su "${_REMOTE_USER:-root}" -s /bin/sh -c "command -v \"$1\"" 2>/dev/null \
+        || true)"
+    [ -x "$p" ] && printf '%s\n' "$p"
+}
 
-mkdir -p -m 755 /etc/apt/keyrings
-out="$(mktemp)"
-curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg -o "${out}"
-cat "${out}" | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
-chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+if bin="$(find_bin gh)"; then
+    echo "gh: already installed at ${bin}; skipping install"
+else
+    # Install via the official GitHub CLI apt repository
+    # https://github.com/cli/cli/blob/trunk/docs/install_linux.md#debian
+    apt-get update
+    apt-get install -y curl gpg
 
-mkdir -p -m 755 /etc/apt/sources.list.d
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
-    | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+    mkdir -p -m 755 /etc/apt/keyrings
+    out="$(mktemp)"
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg -o "${out}"
+    cat "${out}" | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+    chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
 
-apt-get update
-apt-get install -y gh
+    mkdir -p -m 755 /etc/apt/sources.list.d
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+        | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+
+    apt-get update
+    apt-get install -y gh
+fi
 
 # Install gh extensions
 # - not passed: JSON default provides "github/gh-stack"

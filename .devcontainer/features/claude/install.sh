@@ -4,20 +4,38 @@ set -euo pipefail
 
 CHANNEL="${CHANNEL:-latest}"
 
-# Install via the official Claude Code apt repository
-# https://code.claude.com/docs/en/setup#install-with-linux-package-managers
-apt-get update
-apt-get install -y curl
+# A binary already on PATH belongs to someone else -- the base image, another
+# feature, or the user's dotfiles. Reinstalling over it either hard-fails (dpkg
+# file conflict, npm EEXIST) or silently clobbers their copy, so leave it alone
+# and skip only the install; the config below always runs.
+#
+# Checked as root AND as $_REMOTE_USER: `npm i -g` under nvm and native
+# installers writing ~/.local/bin land on the remote user's PATH only.
+find_bin() {
+    p="$(command -v "$1" 2>/dev/null \
+        || su "${_REMOTE_USER:-root}" -s /bin/sh -c "command -v \"$1\"" 2>/dev/null \
+        || true)"
+    [ -x "$p" ] && printf '%s\n' "$p"
+}
 
-install -d -m 0755 /etc/apt/keyrings
-curl -fsSL https://downloads.claude.ai/keys/claude-code.asc \
-    -o /etc/apt/keyrings/claude-code.asc
+if bin="$(find_bin claude)"; then
+    echo "claude: already installed at ${bin}; skipping install"
+else
+    # Install via the official Claude Code apt repository
+    # https://code.claude.com/docs/en/setup#install-with-linux-package-managers
+    apt-get update
+    apt-get install -y curl
 
-echo "deb [signed-by=/etc/apt/keyrings/claude-code.asc] https://downloads.claude.ai/claude-code/apt/${CHANNEL} ${CHANNEL} main" \
-    | tee /etc/apt/sources.list.d/claude-code.list > /dev/null
+    install -d -m 0755 /etc/apt/keyrings
+    curl -fsSL https://downloads.claude.ai/keys/claude-code.asc \
+        -o /etc/apt/keyrings/claude-code.asc
 
-apt-get update
-apt-get install -y claude-code
+    echo "deb [signed-by=/etc/apt/keyrings/claude-code.asc] https://downloads.claude.ai/claude-code/apt/${CHANNEL} ${CHANNEL} main" \
+        | tee /etc/apt/sources.list.d/claude-code.list > /dev/null
+
+    apt-get update
+    apt-get install -y claude-code
+fi
 
 # The bind mounts do not exist at image build time, so linking has to happen at
 # runtime; ship the script and let postStartCommand run it.
