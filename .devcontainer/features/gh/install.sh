@@ -65,3 +65,23 @@ install -m 0755 "$(dirname "$0")/links.sh" "$SHARE/links.sh"
 # Feature options are only in the environment during install; persist for postStart.
 printf '%s\n' "${EXCLUDE:-}" > "$SHARE/exclude"
 chmod 0644 "$SHARE/exclude"
+
+# Install the official gh agent skill from cli/cli, pinned to the gh version we
+# just installed so the guidance matches the binary. Falls back to the default
+# branch for versions whose tag predates skills/.
+# Runs as root: --dir puts the skill in a system path, and the lockfile gh writes
+# lands in root's throwaway ~/.agents, never in $_REMOTE_USER's mounted home.
+SKILLS="$SHARE/skills"
+install -d -m 0755 "$SKILLS"
+GH_VERSION="$(gh --version | awk 'NR==1 {print $3}')"
+gh skill install cli/cli gh --pin "v${GH_VERSION}" --force --dir "$SKILLS" \
+    || gh skill install cli/cli gh --force --dir "$SKILLS"
+
+# Expose the single copy to each agent's system-wide skills dir. Both are
+# outside the host mounts the claude/codex features own, so nothing here can
+# be adopted onto the host or shadow the host's own skills.
+install -d -m 0755 /etc/claude-code/.claude/skills   # Claude Code, managed scope
+ln -sfn "$SKILLS/gh" /etc/claude-code/.claude/skills/gh
+
+install -d -m 0755 /etc/codex/skills                 # Codex, admin scope
+ln -sfn "$SKILLS/gh" /etc/codex/skills/gh

@@ -62,6 +62,8 @@ Installs [OpenCode](https://opencode.ai) CLI and mounts `~/.claude` / `~/.local/
 
 Installs the latest [GitHub CLI](https://cli.github.com) and mounts `~/.config/gh` from the host — see [How mounts are linked](#how-mounts-are-linked). The `extensions` option is a comma-separated list of extensions installed with `gh extension install` (default: `github/gh-stack`); set it to an empty string to install none.
 
+Also installs the official [`cli/cli` `gh` skill](https://github.com/cli/cli/blob/trunk/skills/gh/SKILL.md), pinned to the installed `gh` version, as a symlink into Claude Code's managed skills dir (`/etc/claude-code/.claude/skills`) and Codex's admin skills dir (`/etc/codex/skills`). Both are system-wide locations outside any host mount, so they're populated for every agent without touching `~/.claude/skills` or `~/.agents/skills`, which the `claude`/`codex`/`opencode` features bind-mount from the host.
+
 ```json
 "features": {
     "ghcr.io/sarisia/devcontainer-features/gh:2": {
