@@ -1,6 +1,6 @@
 {
     "id": "claude",
-    "version": "2.2.0",
+    "version": "3.0.0",
     "name": "claude",
     "legacyIds": ["claude-code"],
     "options": {
@@ -9,26 +9,22 @@
             "enum": ["latest", "stable"],
             "default": "latest",
             "description": "Claude Code apt release channel"
-        },
-        "exclude": {
-            "type": "string",
-            "default": "",
-            "description": "Comma-separated entry names to keep container-local instead of symlinking from the host: top-level entries of `~/.claude` (e.g. `settings.json,skills`), plus `.claude.json` for the host's `~/.claude.json`. Also suppresses container->host adoption for the listed entries."
         }
     },
     "mounts": [
         {
-            "source": "${localEnv:HOME}/.claude",
-            "target": "/mnt/.claude",
-            "type": "bind"
+            "source": "claude-config-${devcontainerId}",
+            "target": "/mnt/claude-config",
+            "type": "volume"
         },
         {
-            "source": "${localEnv:HOME}/.claude.json",
-            "target": "/mnt/.claude.json",
-            "type": "bind"
+            "source": "claude-auth",
+            "target": "/mnt/claude-auth",
+            "type": "volume"
         }
     ],
-    "postStartCommand": {
-        "link-mounts": "/usr/local/share/claude-feature/links.sh"
+    "containerEnv": {
+        "CLAUDE_CONFIG_DIR": "/mnt/claude-config",
+        "CLAUDE_SECURESTORAGE_CONFIG_DIR": "/mnt/claude-auth"
     }
 }

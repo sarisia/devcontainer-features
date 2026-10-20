@@ -37,13 +37,18 @@ else
     apt-get install -y claude-code
 fi
 
-# The bind mounts do not exist at image build time, so linking has to happen at
-# runtime; ship the script and let postStartCommand run it.
-SHARE=/usr/local/share/claude-feature
-install -d -m 0755 "$SHARE"
-install -m 0644 "$(dirname "$0")/link-mounts.sh" "$SHARE/link-mounts.sh"
-install -m 0755 "$(dirname "$0")/links.sh" "$SHARE/links.sh"
+# A fresh named volume copies the ownership of its image mount point, so this
+# hands both volumes to the remote user without a runtime chown.
+REMOTE_USER="${_REMOTE_USER:-root}"
+install -d -m 0700 -o "$REMOTE_USER" -g "$(id -gn "$REMOTE_USER")" \
+    /mnt/claude-config /mnt/claude-auth
 
-# Feature options are only in the environment during install; persist for postStart.
-printf '%s\n' "${EXCLUDE:-}" > "$SHARE/exclude"
-chmod 0644 "$SHARE/exclude"
+# CLAUDE_CONFIG_DIR points at the volume; link ~/.claude too so dotfiles
+# installers and tools that hard-code ~/.claude land in the same place.
+REMOTE_HOME="${_REMOTE_USER_HOME:-$(getent passwd "$REMOTE_USER" | cut -d: -f6)}"
+if [ -e "$REMOTE_HOME/.claude" ] || [ -L "$REMOTE_HOME/.claude" ]; then
+    echo "claude: $REMOTE_HOME/.claude already exists; not linking it to /mnt/claude-config"
+else
+    ln -s /mnt/claude-config "$REMOTE_HOME/.claude"
+    chown -h "$REMOTE_USER:$(id -gn "$REMOTE_USER")" "$REMOTE_HOME/.claude"
+fi
