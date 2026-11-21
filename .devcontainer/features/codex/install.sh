@@ -42,13 +42,8 @@ link_home() {
     chown -h "$REMOTE_USER:$REMOTE_GROUP" "$dst"
 }
 
-install -d -m 0700 -o "$REMOTE_USER" -g "$REMOTE_GROUP" /mnt/codex-home /mnt/codex-auth
+install -d -m 0700 -o "$REMOTE_USER" -g "$REMOTE_GROUP" /mnt/codex-home
 install -d -m 0755 -o "$REMOTE_USER" -g "$REMOTE_GROUP" /mnt/agents
-
-# Codex opens auth.json without O_NOFOLLOW, so a login writes through this link
-# into the volume every container shares.
-ln -sfn /mnt/codex-auth/auth.json /mnt/codex-home/auth.json
-chown -h "$REMOTE_USER:$REMOTE_GROUP" /mnt/codex-home/auth.json
 
 link_home /mnt/codex-home .codex
 link_home /mnt/agents .agents

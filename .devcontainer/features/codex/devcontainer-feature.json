@@ -1,6 +1,6 @@
 {
     "id": "codex",
-    "version": "4.0.0",
+    "version": "4.1.0",
     "name": "codex",
     "description": "Installs Codex CLI and keeps ~/.codex and ~/.agents in Docker volumes so auth and sessions persist across rebuilds.",
     "installsAfter": [
@@ -13,11 +13,6 @@
             "type": "volume"
         },
         {
-            "source": "codex-auth",
-            "target": "/mnt/codex-auth",
-            "type": "volume"
-        },
-        {
             "source": "agents-${devcontainerId}",
             "target": "/mnt/agents",
             "type": "volume"
@@ -27,6 +22,6 @@
         "CODEX_HOME": "/mnt/codex-home"
     },
     "postCreateCommand": {
-        "fix-owner": "for d in /mnt/codex-home /mnt/codex-auth /mnt/agents; do [ -O \"$d\" ] || sudo chown -R \"$(id -u):$(id -g)\" \"$d\"; done"
+        "fix-owner": "for d in /mnt/codex-home /mnt/agents; do [ -O \"$d\" ] || sudo chown -R \"$(id -u):$(id -g)\" \"$d\"; done"
     }
 }

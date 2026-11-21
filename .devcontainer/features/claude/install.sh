@@ -38,10 +38,10 @@ else
 fi
 
 # A fresh named volume copies the ownership of its image mount point, so this
-# hands both volumes to the remote user without a runtime chown.
+# hands the volume to the remote user without a runtime chown.
 REMOTE_USER="${_REMOTE_USER:-root}"
 install -d -m 0700 -o "$REMOTE_USER" -g "$(id -gn "$REMOTE_USER")" \
-    /mnt/claude-config /mnt/claude-auth
+    /mnt/claude-config
 
 # CLAUDE_CONFIG_DIR points at the volume; link ~/.claude too so dotfiles
 # installers and tools that hard-code ~/.claude land in the same place.

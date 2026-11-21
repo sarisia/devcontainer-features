@@ -1,10 +1,10 @@
 {
     "id": "gh",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "name": "gh",
     "mounts": [
         {
-            "source": "gh-config",
+            "source": "gh-config-${devcontainerId}",
             "target": "/mnt/gh-config",
             "type": "volume"
         }

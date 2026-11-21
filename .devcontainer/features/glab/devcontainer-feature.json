@@ -1,10 +1,10 @@
 {
     "id": "glab",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "name": "glab",
     "mounts": [
         {
-            "source": "glab-config",
+            "source": "glab-config-${devcontainerId}",
             "target": "/mnt/glab-config",
             "type": "volume"
         }
