@@ -52,6 +52,12 @@ done
 SHARE=/usr/local/share/gh-feature
 install -d -m 0755 "$SHARE"
 
+# gh runs only installed extensions, never gh-* on PATH, and installs a local
+# extension only from ".", linking that dir by its basename.
+install -d -m 0755 "$SHARE/gh-auth-pat"
+install -m 0755 "$(dirname "$0")/gh-auth-pat" "$SHARE/gh-auth-pat/gh-auth-pat"
+su "${_REMOTE_USER:-root}" -s /bin/sh -c 'cd "$1" && gh extension install .' _ "$SHARE/gh-auth-pat"
+
 # Install the official gh agent skill from cli/cli, pinned to the gh version we
 # just installed so the guidance matches the binary. Falls back to the default
 # branch for versions whose tag predates skills/.

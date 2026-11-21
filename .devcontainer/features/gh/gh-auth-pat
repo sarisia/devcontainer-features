@@ -1,0 +1,61 @@
+#!/bin/bash
+# Usage: gh auth-pat [OWNER/REPO]
+# Logs gh in with a fine-grained PAT scoped to read contents, issues, pull requests
+# and actions of one repository. Defaults to the repository of the `origin` remote.
+
+set -euo pipefail
+
+repo="${1:-}"
+if [ -z "$repo" ]; then
+    url="$(git remote get-url origin 2>/dev/null || true)"
+    repo="$(printf '%s\n' "$url" | sed -nE 's#^(https://|ssh://)?([^@/]+@)?github\.com[:/]([^/]+/[^/]+)$#\3#p')"
+    repo="${repo%.git}"
+fi
+if ! [[ "$repo" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+    echo "usage: gh auth-pat [OWNER/REPO] (no github.com origin remote found)" >&2
+    exit 1
+fi
+owner="${repo%%/*}"
+
+# The PAT form caps the name at 40 characters.
+name="devcontainer ${repo}"
+name="${name:0:40}"
+
+enc() {
+    local s="$1" i c out=""
+    for ((i = 0; i < ${#s}; i++)); do
+        c="${s:i:1}"
+        case "$c" in
+            [A-Za-z0-9._~-]) out+="$c" ;;
+            *) out+="$(printf '%%%02X' "'$c")" ;;
+        esac
+    done
+    printf '%s' "$out"
+}
+
+cat <<EOF
+1. Open this URL and create the token:
+
+   https://github.com/settings/personal-access-tokens/new?name=$(enc "$name")&description=$(enc "gh in devcontainer for ${repo}")&target_name=$(enc "$owner")&contents=read&issues=read&pull_requests=read&actions=read
+
+2. Under "Repository access", choose "Only select repositories" -> ${repo}
+   (the URL cannot preselect a repository).
+
+EOF
+
+read -rsp "Paste the token: " token </dev/tty
+echo
+[ -n "$token" ] || { echo "no token given" >&2; exit 1; }
+
+printf '%s\n' "$token" | gh auth login --hostname github.com --with-token --insecure-storage
+
+if [ -n "${GH_TOKEN:-}${GITHUB_TOKEN:-}" ]; then
+    echo "warning: GH_TOKEN/GITHUB_TOKEN is set and overrides the stored token" >&2
+fi
+
+if gh api "repos/${repo}" --hostname github.com --silent; then
+    echo "Logged in; token can read ${repo}."
+else
+    echo "Logged in, but the token cannot read ${repo}; check its repository access." >&2
+    exit 1
+fi

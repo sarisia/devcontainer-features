@@ -75,6 +75,8 @@ OpenCode keeps its login in the same database as its sessions, so the login can'
 
 Installs the latest [GitHub CLI](https://cli.github.com) and keeps `~/.config/gh` in the `gh-config-${devcontainerId}` volume at `/mnt/gh-config` (`GH_CONFIG_DIR`): `gh auth login` once per container — see [How state is kept](#how-state-is-kept). The `extensions` option is a comma-separated list of extensions installed with `gh extension install` (default: `github/gh-stack`); set it to an empty string to install none.
 
+`gh auth-pat [OWNER/REPO]` logs in with a fine-grained PAT that can only read contents, issues, pull requests and actions of one repository (default: the `origin` remote). It prints a pre-filled token creation URL, waits for the token, runs `gh auth login --with-token --insecure-storage`, and checks that the token can read the repository. GitHub's URL can't preselect a repository, so pick it under **Repository access → Only select repositories**.
+
 Also installs the official [`cli/cli` `gh` skill](https://github.com/cli/cli/blob/trunk/skills/gh/SKILL.md), pinned to the installed `gh` version, as a symlink into Claude Code's managed skills dir (`/etc/claude-code/.claude/skills`) and Codex's admin skills dir (`/etc/codex/skills`). Both are system-wide locations outside any volume, so they're populated for every agent without touching `~/.claude/skills` or `~/.agents/skills`.
 
 ```json
