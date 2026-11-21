@@ -1,22 +1,18 @@
 {
     "id": "glab",
-    "version": "2.2.0",
+    "version": "3.0.0",
     "name": "glab",
     "mounts": [
         {
-            "source": "${localEnv:HOME}/.config/glab-cli",
-            "target": "/mnt/glab-cli",
-            "type": "bind"
+            "source": "glab-config",
+            "target": "/mnt/glab-config",
+            "type": "volume"
         }
     ],
-    "options": {
-        "exclude": {
-            "type": "string",
-            "default": "",
-            "description": "Comma-separated entry names to keep container-local instead of symlinking from the host: top-level entries of `~/.config/glab-cli` (e.g. `config.yml`). Also suppresses container->host adoption for the listed entries."
-        }
+    "containerEnv": {
+        "GLAB_CONFIG_DIR": "/mnt/glab-config"
     },
-    "postStartCommand": {
-        "link-mounts": "/usr/local/share/glab-feature/links.sh"
+    "postCreateCommand": {
+        "fix-owner": "for d in /mnt/glab-config; do [ -O \"$d\" ] || sudo chown -R \"$(id -u):$(id -g)\" \"$d\"; done"
     }
 }

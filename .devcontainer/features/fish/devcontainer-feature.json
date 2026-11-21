@@ -1,6 +1,6 @@
 {
     "id": "fish",
-    "version": "1.3.0",
+    "version": "2.0.0",
     "name": "fish",
     "legacyIds": ["fish-shell-history"],
     "mounts": [
@@ -11,6 +11,6 @@
         }
     ],
     "postCreateCommand": {
-        "fix-volume-perm": "bash -c 'sudo chown -R ${USER}:${USER} /mnt/fish-shell-history'"
+        "fix-owner": "for d in /mnt/fish-shell-history; do [ -O \"$d\" ] || sudo chown -R \"$(id -u):$(id -g)\" \"$d\"; done"
     }
 }

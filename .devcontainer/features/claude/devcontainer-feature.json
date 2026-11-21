@@ -1,6 +1,6 @@
 {
     "id": "claude",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "name": "claude",
     "legacyIds": ["claude-code"],
     "options": {
@@ -26,5 +26,8 @@
     "containerEnv": {
         "CLAUDE_CONFIG_DIR": "/mnt/claude-config",
         "CLAUDE_SECURESTORAGE_CONFIG_DIR": "/mnt/claude-auth"
+    },
+    "postCreateCommand": {
+        "fix-owner": "for d in /mnt/claude-config /mnt/claude-auth; do [ -O \"$d\" ] || sudo chown -R \"$(id -u):$(id -g)\" \"$d\"; done"
     }
 }

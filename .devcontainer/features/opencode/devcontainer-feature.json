@@ -1,35 +1,23 @@
 {
     "id": "opencode",
-    "version": "3.2.0",
+    "version": "4.0.0",
     "name": "opencode",
     "installsAfter": [
         "ghcr.io/devcontainers/features/node:2"
     ],
-    "options": {
-        "exclude": {
-            "type": "string",
-            "default": "",
-            "description": "Comma-separated entry names to keep container-local instead of symlinking from the host: top-level entries of `~/.claude`, `~/.local/share/opencode` and `~/.agents` (e.g. `settings.json,skills`). Also suppresses container->host adoption for the listed entries."
-        }
-    },
     "mounts": [
         {
-            "source": "${localEnv:HOME}/.claude",
-            "target": "/mnt/.claude",
-            "type": "bind"
+            "source": "opencode-data-${devcontainerId}",
+            "target": "/mnt/opencode-data",
+            "type": "volume"
         },
         {
-            "source": "${localEnv:HOME}/.local/share/opencode",
-            "target": "/mnt/opencode",
-            "type": "bind"
-        },
-        {
-            "source": "${localEnv:HOME}/.agents",
-            "target": "/mnt/.agents",
-            "type": "bind"
+            "source": "agents-${devcontainerId}",
+            "target": "/mnt/agents",
+            "type": "volume"
         }
     ],
-    "postStartCommand": {
-        "link-mounts": "/usr/local/share/opencode-feature/links.sh"
+    "postCreateCommand": {
+        "fix-owner": "for d in /mnt/opencode-data /mnt/agents; do [ -O \"$d\" ] || sudo chown -R \"$(id -u):$(id -g)\" \"$d\"; done"
     }
 }

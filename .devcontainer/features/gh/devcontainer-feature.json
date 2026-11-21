@@ -1,27 +1,25 @@
 {
     "id": "gh",
-    "version": "2.3.0",
+    "version": "3.0.0",
     "name": "gh",
     "mounts": [
         {
-            "source": "${localEnv:HOME}/.config/gh",
-            "target": "/mnt/gh",
-            "type": "bind"
+            "source": "gh-config",
+            "target": "/mnt/gh-config",
+            "type": "volume"
         }
     ],
+    "containerEnv": {
+        "GH_CONFIG_DIR": "/mnt/gh-config"
+    },
     "options": {
         "extensions": {
             "type": "string",
             "default": "github/gh-stack",
             "description": "Comma-separated list of gh extensions to install with `gh extension install`. Empty string installs none."
-        },
-        "exclude": {
-            "type": "string",
-            "default": "",
-            "description": "Comma-separated entry names to keep container-local instead of symlinking from the host: top-level entries of `~/.config/gh` (e.g. `config.yml`). Also suppresses container->host adoption for the listed entries."
         }
     },
-    "postStartCommand": {
-        "link-mounts": "/usr/local/share/gh-feature/links.sh"
+    "postCreateCommand": {
+        "fix-owner": "for d in /mnt/gh-config; do [ -O \"$d\" ] || sudo chown -R \"$(id -u):$(id -g)\" \"$d\"; done"
     }
 }

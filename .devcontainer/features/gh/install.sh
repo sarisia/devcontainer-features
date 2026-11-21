@@ -49,22 +49,8 @@ for ext in "${_exts[@]}"; do
     su ${_REMOTE_USER} -c "gh extension install '${ext}'"
 done
 
-# `gh extension install` above can write a container-local ~/.config/gh/config.yml.
-# Discard it before linking -- it's build-time junk, not user data, and if left
-# in place it would get adopted onto (or shadow) the host's real config.yml
-# once the mount is linked.
-su ${_REMOTE_USER} -c 'rm -rf ~/.config/gh'
-
-# The bind mount does not exist at image build time, so linking has to happen at
-# runtime; ship the script and let postStartCommand run it.
 SHARE=/usr/local/share/gh-feature
 install -d -m 0755 "$SHARE"
-install -m 0644 "$(dirname "$0")/link-mounts.sh" "$SHARE/link-mounts.sh"
-install -m 0755 "$(dirname "$0")/links.sh" "$SHARE/links.sh"
-
-# Feature options are only in the environment during install; persist for postStart.
-printf '%s\n' "${EXCLUDE:-}" > "$SHARE/exclude"
-chmod 0644 "$SHARE/exclude"
 
 # Install the official gh agent skill from cli/cli, pinned to the gh version we
 # just installed so the guidance matches the binary. Falls back to the default
@@ -78,10 +64,27 @@ gh skill install cli/cli gh --pin "v${GH_VERSION}" --force --dir "$SKILLS" \
     || gh skill install cli/cli gh --force --dir "$SKILLS"
 
 # Expose the single copy to each agent's system-wide skills dir. Both are
-# outside the host mounts the claude/codex features own, so nothing here can
-# be adopted onto the host or shadow the host's own skills.
+# outside the volumes the claude/codex features own, so nothing here can
+# shadow the user's own skills.
 install -d -m 0755 /etc/claude-code/.claude/skills   # Claude Code, managed scope
 ln -sfn "$SKILLS/gh" /etc/claude-code/.claude/skills/gh
 
 install -d -m 0755 /etc/codex/skills                 # Codex, admin scope
 ln -sfn "$SKILLS/gh" /etc/codex/skills/gh
+
+# `gh extension install` and `gh skill install` above can write config.yml at
+# build time, into ~/.config/gh or GH_CONFIG_DIR. Discard it: a fresh named
+# volume copies its image mount point, so it would seed every new gh-config
+# volume. Recreated empty and owned by the remote user, which the volume
+# inherits without a runtime chown.
+REMOTE_USER="${_REMOTE_USER:-root}"
+REMOTE_GROUP="$(id -gn "$REMOTE_USER")"
+REMOTE_HOME="${_REMOTE_USER_HOME:-$(getent passwd "$REMOTE_USER" | cut -d: -f6)}"
+rm -rf /mnt/gh-config "$REMOTE_HOME/.config/gh"
+install -d -m 0700 -o "$REMOTE_USER" -g "$REMOTE_GROUP" /mnt/gh-config
+
+# GH_CONFIG_DIR points at the volume; link ~/.config/gh too for tools that
+# hard-code it.
+su "$REMOTE_USER" -s /bin/sh -c 'mkdir -p "$1"' _ "$REMOTE_HOME/.config"
+ln -s /mnt/gh-config "$REMOTE_HOME/.config/gh"
+chown -h "$REMOTE_USER:$REMOTE_GROUP" "$REMOTE_HOME/.config/gh"

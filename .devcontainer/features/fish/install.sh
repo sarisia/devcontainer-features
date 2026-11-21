@@ -47,5 +47,20 @@ else
     apt-get install -y fish
 fi
 
-# symlink in install.sh to avoid conflicting with the mount in devcontainer.json
-su ${_REMOTE_USER} -c 'mkdir -p ~/.local/share/fish && ln -sf /mnt/fish-shell-history/fish_history ~/.local/share/fish/fish_history'
+# A fresh named volume copies the ownership of its image mount point, so this
+# hands the volume to the remote user without a runtime chown.
+REMOTE_USER="${_REMOTE_USER:-root}"
+REMOTE_GROUP="$(id -gn "$REMOTE_USER")"
+REMOTE_HOME="${_REMOTE_USER_HOME:-$(getent passwd "$REMOTE_USER" | cut -d: -f6)}"
+install -d -m 0755 -o "$REMOTE_USER" -g "$REMOTE_GROUP" /mnt/fish-shell-history
+
+# Dangling until fish first saves history; fish resolves the link and writes
+# through it into the volume.
+HIST="$REMOTE_HOME/.local/share/fish/fish_history"
+if [ -e "$HIST" ] && [ ! -L "$HIST" ]; then
+    echo "fish: $HIST already exists; not linking it to /mnt/fish-shell-history"
+else
+    su "$REMOTE_USER" -s /bin/sh -c 'mkdir -p "$(dirname "$1")"' _ "$HIST"
+    ln -sfn /mnt/fish-shell-history/fish_history "$HIST"
+    chown -h "$REMOTE_USER:$REMOTE_GROUP" "$HIST"
+fi

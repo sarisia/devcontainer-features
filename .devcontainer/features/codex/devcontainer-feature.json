@@ -1,31 +1,32 @@
 {
     "id": "codex",
-    "version": "3.2.0",
+    "version": "4.0.0",
     "name": "codex",
-    "description": "Installs Codex CLI and mounts ~/.codex and ~/.agents from the host so auth and sessions persist.",
+    "description": "Installs Codex CLI and keeps ~/.codex and ~/.agents in Docker volumes so auth and sessions persist across rebuilds.",
     "installsAfter": [
         "ghcr.io/devcontainers/features/node:2"
     ],
-    "options": {
-        "exclude": {
-            "type": "string",
-            "default": "",
-            "description": "Comma-separated entry names to keep container-local instead of symlinking from the host: top-level entries of `~/.codex` and `~/.agents` (e.g. `config.toml,skills`). Also suppresses container->host adoption for the listed entries."
-        }
-    },
     "mounts": [
         {
-            "source": "${localEnv:HOME}/.codex",
-            "target": "/mnt/.codex",
-            "type": "bind"
+            "source": "codex-home-${devcontainerId}",
+            "target": "/mnt/codex-home",
+            "type": "volume"
         },
         {
-            "source": "${localEnv:HOME}/.agents",
-            "target": "/mnt/.agents",
-            "type": "bind"
+            "source": "codex-auth",
+            "target": "/mnt/codex-auth",
+            "type": "volume"
+        },
+        {
+            "source": "agents-${devcontainerId}",
+            "target": "/mnt/agents",
+            "type": "volume"
         }
     ],
-    "postStartCommand": {
-        "link-mounts": "/usr/local/share/codex-feature/links.sh"
+    "containerEnv": {
+        "CODEX_HOME": "/mnt/codex-home"
+    },
+    "postCreateCommand": {
+        "fix-owner": "for d in /mnt/codex-home /mnt/codex-auth /mnt/agents; do [ -O \"$d\" ] || sudo chown -R \"$(id -u):$(id -g)\" \"$d\"; done"
     }
 }

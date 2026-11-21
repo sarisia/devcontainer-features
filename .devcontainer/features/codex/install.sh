@@ -22,13 +22,33 @@ else
     su ${_REMOTE_USER} -c "npm i -g @openai/codex" 2>&1
 fi
 
-# The bind mounts do not exist at image build time, so linking has to happen at
-# runtime; ship the script and let postStartCommand run it.
-SHARE=/usr/local/share/codex-feature
-install -d -m 0755 "$SHARE"
-install -m 0644 "$(dirname "$0")/link-mounts.sh" "$SHARE/link-mounts.sh"
-install -m 0755 "$(dirname "$0")/links.sh" "$SHARE/links.sh"
+# A fresh named volume copies the ownership and contents of its image mount
+# point, so this hands the volumes to the remote user without a runtime chown.
+REMOTE_USER="${_REMOTE_USER:-root}"
+REMOTE_GROUP="$(id -gn "$REMOTE_USER")"
+REMOTE_HOME="${_REMOTE_USER_HOME:-$(getent passwd "$REMOTE_USER" | cut -d: -f6)}"
 
-# Feature options are only in the environment during install; persist for postStart.
-printf '%s\n' "${EXCLUDE:-}" > "$SHARE/exclude"
-chmod 0644 "$SHARE/exclude"
+# Point $2 under the remote user's home at volume $1, so tools and dotfiles
+# installers that hard-code the home path land in the volume.
+link_home() {
+    dst="$REMOTE_HOME/$2"
+    [ "$(readlink "$dst" 2>/dev/null)" = "$1" ] && return 0
+    if [ -e "$dst" ] || [ -L "$dst" ]; then
+        echo "codex: $dst already exists; not linking it to $1"
+        return 0
+    fi
+    su "$REMOTE_USER" -s /bin/sh -c 'mkdir -p "$(dirname "$1")"' _ "$dst"
+    ln -s "$1" "$dst"
+    chown -h "$REMOTE_USER:$REMOTE_GROUP" "$dst"
+}
+
+install -d -m 0700 -o "$REMOTE_USER" -g "$REMOTE_GROUP" /mnt/codex-home /mnt/codex-auth
+install -d -m 0755 -o "$REMOTE_USER" -g "$REMOTE_GROUP" /mnt/agents
+
+# Codex opens auth.json without O_NOFOLLOW, so a login writes through this link
+# into the volume every container shares.
+ln -sfn /mnt/codex-auth/auth.json /mnt/codex-home/auth.json
+chown -h "$REMOTE_USER:$REMOTE_GROUP" /mnt/codex-home/auth.json
+
+link_home /mnt/codex-home .codex
+link_home /mnt/agents .agents
