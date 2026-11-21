@@ -19,32 +19,29 @@ find_bin() {
 if bin="$(find_bin fish)"; then
     echo "fish: already installed at ${bin}; skipping install"
 else
-    . /etc/os-release
-
-    case "${ID}" in
-        debian)
-            repo="http://download.opensuse.org/repositories/shells:/fish:/release:/4/Debian_${VERSION_ID}"
-            key_url="https://download.opensuse.org/repositories/shells:fish:release:4/Debian_${VERSION_ID}/Release.key"
-
-            echo "deb [signed-by=/etc/apt/trusted.gpg.d/shells_fish_release_4.gpg] ${repo}/ /" \
-                > /etc/apt/sources.list.d/shells:fish:release:4.list
-            curl -fsSL "${key_url}" | gpg --dearmor \
-                > /etc/apt/trusted.gpg.d/shells_fish_release_4.gpg
-            ;;
-        ubuntu)
-            curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x88421E703EDC7AF54967DED473C9FCC9E2BB48DA" \
-                | gpg --dearmor > /etc/apt/trusted.gpg.d/fish_release_4.gpg
-            echo "deb [signed-by=/etc/apt/trusted.gpg.d/fish_release_4.gpg] https://ppa.launchpadcontent.net/fish-shell/release-4/ubuntu ${VERSION_CODENAME} main" \
-                > /etc/apt/sources.list.d/fish-shell-release-4.list
-            ;;
-        *)
-            echo "Unsupported OS: ${ID}" >&2
-            exit 1
-            ;;
+    # Static build from GitHub releases: a single self-contained binary, so no
+    # distro repo (OBS mirrors are too flaky) and no per-distro branching.
+    case "$(uname -m)" in
+        x86_64)        arch=x86_64 ;;
+        aarch64|arm64) arch=aarch64 ;;
+        *) echo "fish: unsupported architecture: $(uname -m)" >&2; exit 1 ;;
     esac
 
-    apt-get update
-    apt-get install -y fish
+    if ! command -v curl >/dev/null || ! command -v xz >/dev/null; then
+        apt-get update
+        apt-get install -y --no-install-recommends ca-certificates curl xz-utils
+    fi
+
+    FISH_VERSION="${VERSION:-latest}"
+    if [ "$FISH_VERSION" = latest ]; then
+        FISH_VERSION="$(basename "$(curl -fsSLI -o /dev/null -w '%{url_effective}' \
+            https://github.com/fish-shell/fish-shell/releases/latest)")"
+    fi
+
+    curl -fsSL "https://github.com/fish-shell/fish-shell/releases/download/${FISH_VERSION}/fish-${FISH_VERSION}-linux-${arch}.tar.xz" \
+        | tar -xJ -C /usr/local/bin fish
+    chmod 0755 /usr/local/bin/fish
+    grep -qx /usr/local/bin/fish /etc/shells || echo /usr/local/bin/fish >> /etc/shells
 fi
 
 # A fresh named volume copies the ownership of its image mount point, so this

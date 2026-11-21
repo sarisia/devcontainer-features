@@ -1,8 +1,15 @@
 {
     "id": "fish",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "name": "fish",
     "legacyIds": ["fish-shell-history"],
+    "options": {
+        "version": {
+            "type": "string",
+            "default": "latest",
+            "description": "fish release tag to install from GitHub (e.g. 4.9.3), or `latest`."
+        }
+    },
     "mounts": [
         {
             "source": "fish-shell-history-${devcontainerId}",

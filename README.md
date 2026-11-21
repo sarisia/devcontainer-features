@@ -11,7 +11,7 @@ A collection of devcontainer features that keep tool credentials and state in Do
 | [`gh`](#gh) | `ghcr.io/sarisia/devcontainer-features/gh:3` | — | — | `~/.config/gh` |
 | [`glab`](#glab) | `ghcr.io/sarisia/devcontainer-features/glab:3` | — | — | `~/.config/glab-cli` |
 | [`codex`](#codex) | `ghcr.io/sarisia/devcontainer-features/codex:4` | npm | `~/.codex`, `~/.agents` | login (`auth.json`) |
-| [`fish`](#fish) | `ghcr.io/sarisia/devcontainer-features/fish:1` | — | fish history | — |
+| [`fish`](#fish) | `ghcr.io/sarisia/devcontainer-features/fish:2` | — | fish history | — |
 
 > **npm**: can be installed natively on the host or via the [`ghcr.io/devcontainers/features/node:2`](https://github.com/devcontainers/features/tree/main/src/node) devcontainer feature.
 
@@ -123,11 +123,11 @@ Installs [Codex CLI](https://developers.openai.com/codex/cli) via npm — see [H
 
 ### `fish`
 
-Installs [fish shell](https://fishshell.com) v4 and keeps shell history in the `fish-shell-history-${devcontainerId}` volume at `/mnt/fish-shell-history`, per container — see [How state is kept](#how-state-is-kept). Only `~/.local/share/fish/fish_history` is a symlink into the volume. It is left alone if the image already has a real history file there.
+Installs [fish shell](https://fishshell.com) v4 from the static build on [GitHub releases](https://github.com/fish-shell/fish-shell/releases) to `/usr/local/bin/fish`, and keeps shell history in the `fish-shell-history-${devcontainerId}` volume at `/mnt/fish-shell-history`, per container — see [How state is kept](#how-state-is-kept). Only `~/.local/share/fish/fish_history` is a symlink into the volume. It is left alone if the image already has a real history file there. The `version` option pins a release tag such as `4.9.3` (default: `latest`).
 
 ```json
 "features": {
-    "ghcr.io/sarisia/devcontainer-features/fish:1": {}
+    "ghcr.io/sarisia/devcontainer-features/fish:2": {}
 }
 ```
 
